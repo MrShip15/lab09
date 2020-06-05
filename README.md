@@ -91,7 +91,7 @@ EOF
 Логирование по полученому токену для **Travis CI**
 ```sh
 $ travis login --github-token ${GITHUB_TOKEN}
-Successfully logged in as Evgengrmit!
+Successfully logged in as MrShip15!
 ```
 Проверка `.travis.yml` на ошибки
 ```sh
