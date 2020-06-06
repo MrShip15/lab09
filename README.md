@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MrShip15/lab04.svg?branch=master)](https://travis-ci.org/MrShip15/lab04)
+[![Build Status](https://travis-ci.org/MrShip15/lab05.svg?branch=master)](https://travis-ci.org/MrShip15/lab05)
 
 ## Laboratory work IV
 
@@ -11,7 +11,7 @@ $ open https://travis-ci.org
 ## Tasks
 
 - [x] 1. Авторизоваться на сервисе **Travis CI** с использованием **GitHub** аккаунта
-- [x] 2. Создать публичный репозиторий с названием **lab04** на сервисе **GitHub**
+- [x] 2. Создать публичный репозиторий с названием **lab05** на сервисе **GitHub**
 - [x] 3. Ознакомиться со ссылками учебного материала
 - [x] 4. Включить интеграцию сервиса **Travis CI** с созданным репозиторием
 - [x] 5. Получить токен для **Travis CLI** с правами **repo** и **user**
@@ -48,12 +48,12 @@ $ brew install ruby # установка интерпретатора языка
 $ gem install travis # установка travis из пакетного менеджера ruby
 Successfully installed travis-1.8.13
 ```
-Настройка git-репозитория **lab04** для работы
+Настройка git-репозитория **lab05** для работы
 ```sh
-$ git clone https://github.com/${GITHUB_USERNAME}/lab03 projects/lab04
-$ cd projects/lab04
+$ git clone https://github.com/${GITHUB_USERNAME}/lab03 projects/lab05
+$ cd projects/lab05
 $ git remote remove origin
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab04
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab05
 ```
 Создание файла `.travis.yml`
 ```sh
@@ -100,7 +100,7 @@ Hooray, .travis.yml looks valid :)
 ```
 Вставка значков с Build Status для `travis-ci.org`
 ```sh
-[![Build Status](https://travis-ci.org/MrShip15/lab04.svg?branch=master)](https://travis-ci.org/MrShip15/lab04)
+[![Build Status](https://travis-ci.org/MrShip15/lab05.svg?branch=master)](https://travis-ci.org/MrShip15/lab05)
 ```
 Запись изменений в удаленный репозиторий
 ```sh
