@@ -1,184 +1,134 @@
-[![Build Status](https://travis-ci.org/MrShip15/lab06.svg?branch=master)](https://travis-ci.org/MrShip15/lab06)
-## Laboratory work VI
+## Laboratory work VII
+<a href="https://yandex.ru/efir/?stream_id=vDHLoKtKoa3o"><img src="https://raw.githubusercontent.com/tp-labs/lab07/master/preview.png" width="640"/></a>
 
-<a href="https://yandex.ru/efir/?stream_id=vGWlFO3of-Rg"><img src="https://raw.githubusercontent.com/tp-labs/lab06/master/preview.png" width="640"/></a>
-
-Данная лабораторная работа посвещена изучению средств пакетирования на примере **CPack**
+Данная лабораторная работа посвещена изучению систем управления пакетами на примере **Hunter**
 
 ```sh
-$ open https://cmake.org/Wiki/CMake:CPackPackageGenerators
+$ open https://github.com/ruslo/hunter
 ```
 
 ## Tasks
 
-
-- [x] 1. Создать публичный репозиторий с названием **lab06** на сервисе **GitHub**
+- [x] 1. Создать публичный репозиторий с названием **lab07** на сервисе **GitHub**
 - [x] 2. Выполнить инструкцию учебного материала
 - [x] 3. Ознакомиться со ссылками учебного материала
 - [x] 4. Составить отчет и отправить ссылку личным сообщением в **Slack**
 
 ## Tutorial
-Создание переменных среды и установка их значений, а также связывание команд с их "новыми" названиями
+Создание переменных среды и установка их значений, а также связывание команд с их "новыми" названиями.
 ```sh
 $ export GITHUB_USERNAME=MrShip15
-$ export GITHUB_EMAIL==mr_ship2001@mail.ru
-$ alias edit=nano
-$ alias gsed=sed # for *-nix system
+$ alias gsed=sed
 ```
 Начало работы в каталоге workspace
 ```sh
-# Переход в  рабочую директорию
 $ cd ${GITHUB_USERNAME}/workspace
-$ pushd . # Сохранение текущего каталога в стек
-# Активация Node.js и rvm
+$ pushd .
 $ source scripts/activate
 ```
-Настройка git-репозитория **lab06** для работы
+Настройка git-репозитория **lab07** для работы
 ```sh
-$ git clone https://github.com/${GITHUB_USERNAME}/lab05 projects/lab06
-$ cd projects/lab06
+$ git clone https://github.com/${GITHUB_USERNAME}/lab06 projects/lab07
+$ cd projects/lab07
 $ git remote remove origin
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab06
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab07
 ```
-Настройка **CPack** через определение CPack-переменных внутри файла `CMakeLists.txt`
-Добавление истории версий для проекта и установка версию 0.1.0.0
+Скачивание и подключение модуля `HunterGate`
 ```sh
-$ gsed -i "" '/project(print)/a\
-set(PRINT_VERSION_STRING "v\${PRINT_VERSION}")
-' CMakeLists.txt
-$ gsed -i "" '/project(print)/a\
-set(PRINT_VERSION\
-  \${PRINT_VERSION_MAJOR}.\${PRINT_VERSION_MINOR}.\${PRINT_VERSION_PATCH}.\${PRINT_VERSION_TWEAK})
-' CMakeLists.txt
-$ gsed -i "" '/project(print)/a\
-set(PRINT_VERSION_TWEAK 0)
-' CMakeLists.txt
-$ gsed -i "" '/project(print)/a\
-set(PRINT_VERSION_PATCH 0)
-' CMakeLists.txt
-$ gsed -i "" '/project(print)/a\
-set(PRINT_VERSION_MINOR 1)
-' CMakeLists.txt
-$ gsed -i "" '/project(print)/a\
-set(PRINT_VERSION_MAJOR 0)
-' CMakeLists.txt
-# Проверка изменений
-$ git diff
-```
-Создание файлов `DESCRIPTION`(описание пакета) и `ChangeLog.md` (описание изменений в пакете)
-```sh
-$ touch DESCRIPTION && edit DESCRIPTION
-$ touch ChangeLog.md
-$ export DATE="`LANG=en_US date +'%a %b %d %Y'`"
-$ cat > ChangeLog.md <<EOF
-* ${DATE} ${GITHUB_USERNAME} <${GITHUB_EMAIL}> 0.1.0.0
-- Initial RPM release
-EOF
-```
-Создание и заполнение файла `CPackConfig.cmake`
-```sh
-# Подключение необходимых системных библиотек
-$ cat > CPackConfig.cmake <<EOF
-include(InstallRequiredSystemLibraries)
-EOF
-```
-Установка значений переменных в пакете
-```sh
-$ cat >> CPackConfig.cmake <<EOF
-set(CPACK_PACKAGE_CONTACT ${GITHUB_EMAIL})
-set(CPACK_PACKAGE_VERSION_MAJOR \${PRINT_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR \${PRINT_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH \${PRINT_VERSION_PATCH})
-set(CPACK_PACKAGE_VERSION_TWEAK \${PRINT_VERSION_TWEAK})
-set(CPACK_PACKAGE_VERSION \${PRINT_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION_FILE \${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION)
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "static C++ library for printing")
-EOF
-```
-Добавление файлов в пакет
-```sh
-$ cat >> CPackConfig.cmake <<EOF
+$ mkdir -p cmake
+$ wget https://raw.githubusercontent.com/cpp-pm/gate/master/cmake/HunterGate.cmake -O cmake/HunterGate.cmake
+$ gsed -i "" '/cmake_minimum_required(VERSION 3.4)/a\
 
-set(CPACK_RESOURCE_FILE_LICENSE \${CMAKE_CURRENT_SOURCE_DIR}/LICENSE)
-set(CPACK_RESOURCE_FILE_README \${CMAKE_CURRENT_SOURCE_DIR}/README.md)
-EOF
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https:\//github.com/cpp-pm/hunter/archive/v0.23.251.tar.gz"
+    SHA1 "5659b15dc0884d4b03dbd95710e6a1fa0fc3258d"
+)
+' CMakeLists.txt
 ```
-Настройки для RPM-пакета
+Теперь не нужно скачивать **GTest** самостоятельно. **Hunter** сам подтянет добавленные с помощью функции `hunter_add_package`.
 ```sh
-$ cat >> CPackConfig.cmake <<EOF
+$ git rm -rf third-party/gtest
+rm 'third-party/gtest'
+$ gsed -i "" '/set(PRINT_VERSION_STRING "v\${PRINT_VERSION}")/a\
 
-set(CPACK_RPM_PACKAGE_NAME "print-devel")
-set(CPACK_RPM_PACKAGE_LICENSE "MIT")
-set(CPACK_RPM_PACKAGE_GROUP "print")
-set(CPACK_RPM_CHANGELOG_FILE \${CMAKE_CURRENT_SOURCE_DIR}/ChangeLog.md)
-set(CPACK_RPM_PACKAGE_RELEASE 1)
+hunter_add_package(GTest)
+find_package(GTest CONFIG REQUIRED)
+' CMakeLists.txt
+$ gsed -i "" 's/add_subdirectory(third-party/gtest)//' CMakeLists.txt
+$ gsed -i "" 's/gtest_main/GTest::gtest_main/' CMakeLists.txt
+```
+Сборка прокта при помощи **Hunter**.
+```sh
+$ cmake -H. -B_builds -DBUILD_TESTS=ON
+$ cmake --build
+$ cmake --build _builds --target test
+$ ls -la $HOME/.hunter
+```
+Установка **Hunter** в систему
+```sh
+$ git clone https://github.com/cpp-pm/hunter $HOME/Evgengrmit/workspace/projects/hunter
+$ export HUNTER_ROOT=$HOME/Evgengrmit/workspace/projects/hunter
+$ rm -rf _builds
+$ cmake -H. -B_builds -DBUILD_TESTS=ON
+$ cmake --build _builds
+```
+Добавление конфигурационного файла в проект, который будет содержать необходимую версию GTest.
+```sh
+$ cat $HUNTER_ROOT/cmake/configs/default.cmake | grep GTest
+$ cat $HUNTER_ROOT/cmake/projects/GTest/hunter.cmake
+$ mkdir cmake/Hunter
+$ cat > cmake/Hunter/config.cmake <<EOF
+hunter_config(GTest VERSION 1.7.0-hunter-9)
 EOF
+# add LOCAL in HunterGate function
 ```
-Настройки для Debian-пакета
+Добавление файла, использующего библиотеку `print`
 ```sh
-$ cat >> CPackConfig.cmake <<EOF
+$ mkdir demo
+$ cat > demo/main.cpp <<EOF
+#include <print.hpp>
 
-set(CPACK_DEBIAN_PACKAGE_NAME "libprint-dev")
-set(CPACK_DEBIAN_PACKAGE_PREDEPENDS "cmake >= 3.0")
-set(CPACK_DEBIAN_PACKAGE_RELEASE 1)
+#include <cstdlib>
+
+int main(int argc, char* argv[])
+{
+  const char* log_path = std::getenv("LOG_PATH");
+  if (log_path == nullptr)
+  {
+    std::cerr << "undefined environment variable: LOG_PATH" << std::endl;
+    return 1;
+  }
+  std::string text;
+  while (std::cin >> text)
+  {
+    std::ofstream out{log_path, std::ios_base::app};
+    print(text, out);
+    out << std::endl;
+  }
+}
 EOF
-```
-Подключение модуля CPack
-```sh
-$ cat >> CPackConfig.cmake <<EOF
 
-include(CPack)
-EOF
-```
-Добавление `CPackConfig.cmake` в основной `CMakeLists.txt`
-```sh
-$ cat >> CMakeLists.txt <<EOF
+$ gsed -i '/endif()/a\
 
-include(CPackConfig.cmake)
-EOF
+add_executable(demo ${CMAKE_CURRENT_SOURCE_DIR}/demo/main.cpp)
+target_link_libraries(demo print)
+install(TARGETS demo RUNTIME DESTINATION bin)
+' CMakeLists.txt
 ```
-
+Добавление подмодуля **polly**, который содержит инструкции для сборки проектов с установленным **Hunter**.
 ```sh
-$ gsed -i 's/lab05/lab06/g' README.md
-```
-Добавляем созданные файлы в репозиторий, делаем коммит, добавляем тэг с версией, загружаем на удаленный репозиторий уже с тэгом
-```sh
-$ git add .
-$ git commit -m"added cpack config"
-$ git tag v0.1.0.0
-$ git push origin master --tags
-```
-Авторизация в `travis-ci`
-```sh
-$ travis login --auto
-$ travis enable
-```
-Сборка и генерация пакета (1 способ через `CPack`)
-```sh
-$ cmake -H. -B_build
-$ cmake --build _build
-$ cd _build
-$ cpack -G "TGZ"
-$ cd ..
-```
-Сборка и генерация пакета (2 способ через `CMake`)
-```sh
-$ cmake -H. -B_build -DCPACK_GENERATOR="TGZ"
-$ cmake --build _build --target package
-```
-Перемещение в `artifacts`
-```sh
-$ mkdir artifacts
-$ mv _build/*.tar.gz artifacts
-$ tree artifacts
+$ mkdir tools
+$ git submodule add https://github.com/ruslo/polly tools/polly
+$ tools/polly/bin/polly.py --test
+$ tools/polly/bin/polly.py --install
 ```
 
 ## Report
-
-Создание отчета по ЛР № 6
+Создание отчета по ЛР № 7
 ```sh
 $ popd
-$ export LAB_NUMBER=06
+$ export LAB_NUMBER=07
 $ git clone https://github.com/tp-labs/lab${LAB_NUMBER} tasks/lab${LAB_NUMBER}
 $ mkdir reports/lab${LAB_NUMBER}
 $ cp tasks/lab${LAB_NUMBER}/README.md reports/lab${LAB_NUMBER}/REPORT.md
@@ -189,10 +139,9 @@ $ gist REPORT.md
 
 ## Links
 
-- [DMG](https://cmake.org/cmake/help/latest/module/CPackDMG.html)
-- [DEB](https://cmake.org/cmake/help/latest/module/CPackDeb.html)
-- [RPM](https://cmake.org/cmake/help/latest/module/CPackRPM.html)
-- [NSIS](https://cmake.org/cmake/help/latest/module/CPackNSIS.html)
+- [Create Hunter package](https://docs.hunter.sh/en/latest/creating-new/create.html)
+- [Custom Hunter config](https://github.com/ruslo/hunter/wiki/example.custom.config.id)
+- [Polly](https://github.com/ruslo/polly)
 
 ```
 Copyright (c) 2015-2020 The ISC Authors
