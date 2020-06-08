@@ -1,5 +1,4 @@
-
-
+[![Build Status](https://travis-ci.org/MrShip15/lab06.svg?branch=master)](https://travis-ci.org/MrShip15/lab06)
 ## Laboratory work VI
 
 <a href="https://yandex.ru/efir/?stream_id=vGWlFO3of-Rg"><img src="https://raw.githubusercontent.com/tp-labs/lab06/master/preview.png" width="640"/></a>
