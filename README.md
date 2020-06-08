@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/MrShip15/lab08.svg?branch=master)](https://travis-ci.org/MrShip15/lab08)
 ## Laboratory work VIII
 
 <a href="https://yandex.ru/efir/?stream_id=v0mnBi_R2Ldw"><img src="https://raw.githubusercontent.com/tp-labs/lab08/master/preview.png" width="640"/></a>
@@ -37,7 +38,7 @@ $ git submodule update --init
 $ git remote remove origin
 $ git remote add origin https://github.com/${GITHUB_USERNAME}/lab08
 ```
-Создаем `Dockerfile`. В самом начале указываем базовый образ (В нашем случае это Ubuntu 18.04), который определяет рабочую среду,пакеты и утилиты необходимые для запуска приложения в нашем контейнере. В Dockerfile содержатся инструкции по созданию образа.
+Создаем `Dockerfile`. В самом начале указываем базовый образ, который определяет рабочую среду,пакеты и утилиты необходимые для запуска приложения в нашем контейнере. В Dockerfile содержатся инструкции по созданию образа.
 ```sh
 $ cat > Dockerfile <<EOF
 FROM ubuntu:18.04
