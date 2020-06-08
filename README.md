@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/MrShip15/lab05.svg?branch=master)](https://travis-ci.org/MrShip15/lab05)
+[![Build Status](https://travis-ci.org/MrShip15/lab06.svg?branch=master)](https://travis-ci.org/MrShip15/lab06)
 ## Laboratory work V
 
-<a href="https://yandex.ru/efir/?stream_id=vQw_LH0UfN6I"><img src="https://raw.githubusercontent.com/tp-labs/lab05/master/preview.png" width="640"/></a>
+<a href="https://yandex.ru/efir/?stream_id=vQw_LH0UfN6I"><img src="https://raw.githubusercontent.com/tp-labs/lab06/master/preview.png" width="640"/></a>
 
 Данная лабораторная работа посвещена изучению фреймворков для тестирования на примере **GTest**
 
@@ -11,7 +11,7 @@ $ open https://github.com/google/googletest
 
 ## Tasks
 
-- [x] 1. Создать публичный репозиторий с названием **lab05** на сервисе **GitHub**
+- [x] 1. Создать публичный репозиторий с названием **lab06** на сервисе **GitHub**
 - [x] 2. Выполнить инструкцию учебного материала
 - [x] 3. Ознакомиться со ссылками учебного материала
 
@@ -28,12 +28,12 @@ $ cd ${GITHUB_USERNAME}/workspace
 $ pushd .
 $ source scripts/activate
 ```
-Настройка git-репозитория **lab05** для работы
+Настройка git-репозитория **lab06** для работы
 ```sh
-$ git clone https://github.com/${GITHUB_USERNAME}/lab05 projects/lab05
-$ cd projects/lab05
+$ git clone https://github.com/${GITHUB_USERNAME}/lab06 projects/lab06
+$ cd projects/lab06
 $ git remote remove origin
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab05
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab06
 ```
 Подключение к репозиторию подмодуля **Google Test**, выбор версии с помощью переключения ветки
 ```sh
@@ -97,7 +97,7 @@ $ cmake --build _build --target test -- ARGS=--verbose
 ```
 Модифицируем `.travis.yml` и `README.md`
 ```sh
-$ gsed -i "" 's/lab05/lab05/g' README.md
+$ gsed -i "" 's/lab06/lab06/g' README.md
 $ gsed -i "" 's/\(DCMAKE_INSTALL_PREFIX=_install\)/\1 -DBUILD_TESTS=ON/' .travis.yml
 $ gsed -i "" '/cmake --build _build --target install/a\
 - cmake --build _build --target test -- ARGS=--verbose
