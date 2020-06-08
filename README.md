@@ -1,135 +1,169 @@
-[![Build Status](https://travis-ci.org/MrShip15/lab07.svg?branch=master)](https://travis-ci.org/MrShip15/lab07)
-## Laboratory work VII
-<a href="https://yandex.ru/efir/?stream_id=vDHLoKtKoa3o"><img src="https://raw.githubusercontent.com/tp-labs/lab07/master/preview.png" width="640"/></a>
+## Laboratory work VIII
 
-Данная лабораторная работа посвещена изучению систем управления пакетами на примере **Hunter**
+<a href="https://yandex.ru/efir/?stream_id=v0mnBi_R2Ldw"><img src="https://raw.githubusercontent.com/tp-labs/lab08/master/preview.png" width="640"/></a>
+
+Данная лабораторная работа посвещена изучению систем автоматизации развёртывания и управления приложениями на примере **Docker**
 
 ```sh
-$ open https://github.com/ruslo/hunter
+$ open https://docs.docker.com/get-started/
 ```
 
 ## Tasks
 
-- [x] 1. Создать публичный репозиторий с названием **lab07** на сервисе **GitHub**
-- [x] 2. Выполнить инструкцию учебного материала
-- [x] 3. Ознакомиться со ссылками учебного материала
+- [x] 1. Создать публичный репозиторий с названием **lab08** на сервисе **GitHub**
+- [x] 2. Ознакомиться со ссылками учебного материала
+- [x] 3. Выполнить инструкцию учебного материала
 - [x] 4. Составить отчет и отправить ссылку личным сообщением в **Slack**
 
 ## Tutorial
+
 Создание переменных среды и установка их значений, а также связывание команд с их "новыми" названиями.
 ```sh
 $ export GITHUB_USERNAME=MrShip15
-$ alias gsed=sed
 ```
-Начало работы в каталоге workspace
+Начало работы в каталоге `workspace`
 ```sh
+# Переход в  рабочую директорию
 $ cd ${GITHUB_USERNAME}/workspace
 $ pushd .
+# Активация Node.js и rvm
 $ source scripts/activate
 ```
 Настройка git-репозитория **lab07** для работы
 ```sh
-$ git clone https://github.com/${GITHUB_USERNAME}/lab06 projects/lab07
-$ cd projects/lab07
+$ git clone https://github.com/${GITHUB_USERNAME}/lab07 lab08
+$ cd lab08
+$ git submodule update --init
 $ git remote remove origin
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab07
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab08
 ```
-Скачивание и подключение модуля `HunterGate`
+Создаем `Dockerfile`. В самом начале указываем базовый образ (В нашем случае это Ubuntu 18.04), который определяет рабочую среду,пакеты и утилиты необходимые для запуска приложения в нашем контейнере. В Dockerfile содержатся инструкции по созданию образа.
 ```sh
-$ mkdir -p cmake
-$ wget https://raw.githubusercontent.com/cpp-pm/gate/master/cmake/HunterGate.cmake -O cmake/HunterGate.cmake
-$ gsed -i "" '/cmake_minimum_required(VERSION 3.4)/a\
-
-include("cmake/HunterGate.cmake")
-HunterGate(
-    URL "https:\//github.com/cpp-pm/hunter/archive/v0.23.251.tar.gz"
-    SHA1 "5659b15dc0884d4b03dbd95710e6a1fa0fc3258d"
-)
-' CMakeLists.txt
-```
-Теперь не нужно скачивать **GTest** самостоятельно. **Hunter** сам подтянет добавленные с помощью функции `hunter_add_package`.
-```sh
-$ git rm -rf third-party/gtest
-rm 'third-party/gtest'
-$ gsed -i "" '/set(PRINT_VERSION_STRING "v\${PRINT_VERSION}")/a\
-
-hunter_add_package(GTest)
-find_package(GTest CONFIG REQUIRED)
-' CMakeLists.txt
-$ gsed -i "" 's/add_subdirectory(third-party/gtest)//' CMakeLists.txt
-$ gsed -i "" 's/gtest_main/GTest::gtest_main/' CMakeLists.txt
-```
-Сборка прокта при помощи **Hunter**.
-```sh
-$ cmake -H. -B_builds -DBUILD_TESTS=ON
-$ cmake --build
-$ cmake --build _builds --target test
-$ ls -la $HOME/.hunter
-```
-Установка **Hunter** в систему
-```sh
-$ git clone https://github.com/cpp-pm/hunter $HOME/Evgengrmit/workspace/projects/hunter
-$ export HUNTER_ROOT=$HOME/Evgengrmit/workspace/projects/hunter
-$ rm -rf _builds
-$ cmake -H. -B_builds -DBUILD_TESTS=ON
-$ cmake --build _builds
-```
-Добавление конфигурационного файла в проект, который будет содержать необходимую версию GTest.
-```sh
-$ cat $HUNTER_ROOT/cmake/configs/default.cmake | grep GTest
-$ cat $HUNTER_ROOT/cmake/projects/GTest/hunter.cmake
-$ mkdir cmake/Hunter
-$ cat > cmake/Hunter/config.cmake <<EOF
-hunter_config(GTest VERSION 1.7.0-hunter-9)
+$ cat > Dockerfile <<EOF
+FROM ubuntu:18.04
 EOF
-# add LOCAL in HunterGate function
 ```
-Добавление файла, использующего библиотеку `print`
+Выполняем обновление списка пакетов **APT** в базовом образе - утилиты для управления пакетами. Затем с его помощью устанавливаем компиляторы и `CMake`.
 ```sh
-$ mkdir demo
-$ cat > demo/main.cpp <<EOF
-#include <print.hpp>
+$ cat >> Dockerfile <<EOF
 
-#include <cstdlib>
-
-int main(int argc, char* argv[])
-{
-  const char* log_path = std::getenv("LOG_PATH");
-  if (log_path == nullptr)
-  {
-    std::cerr << "undefined environment variable: LOG_PATH" << std::endl;
-    return 1;
-  }
-  std::string text;
-  while (std::cin >> text)
-  {
-    std::ofstream out{log_path, std::ios_base::app};
-    print(text, out);
-    out << std::endl;
-  }
-}
+RUN apt update
+RUN apt install -yy gcc g++ cmake
 EOF
-
-$ gsed -i '/endif()/a\
-
-add_executable(demo ${CMAKE_CURRENT_SOURCE_DIR}/demo/main.cpp)
-target_link_libraries(demo print)
-install(TARGETS demo RUNTIME DESTINATION bin)
-' CMakeLists.txt
 ```
-Добавление подмодуля **polly**, который содержит инструкции для сборки проектов с установленным **Hunter**.
+Инструкция `COPY` сообщает Docker о том, что нужно взять файлы и папки из локального контекста сборки и добавить их в текущую рабочую директорию образа. Если целевая директория не существует, эта инструкция её создаст.
+Инструкция `WORKDIR` позволяет изменить рабочую директорию контейнера.
 ```sh
-$ mkdir tools
-$ git submodule add https://github.com/ruslo/polly tools/polly
-$ tools/polly/bin/polly.py --test
-$ tools/polly/bin/polly.py --install
+$ cat >> Dockerfile <<EOF
+
+COPY . print/
+WORKDIR print
+EOF
+```
+Инструкция `RUN` позволяет создать слой во время сборки образа. После её выполнения в образ добавляется новый слой, его состояние фиксируется. Инструкция RUN часто используется для установки в образы дополнительных пакетов.
+```sh
+$ cat >> Dockerfile <<EOF
+
+RUN cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=_install
+RUN cmake --build _build
+RUN cmake --build _build --target install
+EOF
+```
+Инструкция `ENV` позволяет задавать постоянные переменные среды, которые будут доступны в контейнере во время его выполнения.
+```sh
+$ cat >> Dockerfile <<EOF
+
+ENV LOG_PATH /home/logs/log.txt
+EOF
+```
+Инструкция `VOLUME` позволяет указать место, которое контейнер будет использовать для постоянного хранения файлов и для работы с такими файлами.
+```sh
+$ cat >> Dockerfile <<EOF
+
+VOLUME /home/logs
+EOF
+```
+Переход в созданную в процессе сборки директорию `_install/bin`
+```sh
+$ cat >> Dockerfile <<EOF
+
+WORKDIR _install/bin
+EOF
+```
+Инструкция `ENTRYPOINT` позволяет задавать команду с аргументами, которая должна выполняться при запуске контейнера. Она похожа на команду `CMD`, но параметры, задаваемые в `ENTRYPOINT`, не перезаписываются в том случае, если контейнер запускают с параметрами командной строки.
+```sh
+$ cat >> Dockerfile <<EOF
+
+ENTRYPOINT ./demo
+EOF
+```
+Сборка образа с тегом `logger` и путем к `Dockerfile`
+```sh
+$ docker build -t logger .
+```
+Команда, которая выводит всю информацию об образах
+```sh
+$ docker images
+REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
+logger                    latest              8c0810e1dbeb        32 minutes ago       342MB
+ubuntu                    18.04               c3c304cb4f22        6 weeks ago         64.2MB
+hello-world               latest              bf756fb1ae65        5 months ago        13.3kB
+```
+Запуск контейнера в интерактивном режиме. Флаг `-v` указывает куда сохранять получаемые в контейнере файлы.
+```sh
+$ mkdir logs
+$ docker run -it -v "$(pwd)/logs/:/home/logs/" logger /bin/bash
+
+text1
+text2
+text3
+<C-D>
+```
+Вывод подробной информации о контейнере
+```sh
+$ docker inspect logger
+```
+Проверяем, что файлы, полученные во время работы в контейнере были сохранены
+```sh
+$ cat logs/log.txt
+text1
+text2
+text3
+```
+Замена lab07 на lab08
+```sh
+$ gsed -i 's/lab07/lab08/g' README.md
+```
+Изменение `.travis.yml` для сборки в контейнере.
+```sh
+$ vim .travis.yml
+/lang<CR>o
+services:
+- docker<ESC>
+jVGdo
+script:
+- docker build -t logger .<ESC>
+:wq
+```
+Добавление **Docker** в репозиторий.
+```sh
+$ git add Dockerfile
+$ git add .travis.yml
+$ git commit -m"adding Dockerfile"
+$ git push origin master
+```
+Активация непрерывной интеграции с **Travis CI**.
+```sh
+$ travis login --auto
+$ travis enable
 ```
 
 ## Report
-Создание отчета по ЛР № 7
+
 ```sh
+Создание отчета по ЛР № 8
 $ popd
-$ export LAB_NUMBER=07
+$ export LAB_NUMBER=08
 $ git clone https://github.com/tp-labs/lab${LAB_NUMBER} tasks/lab${LAB_NUMBER}
 $ mkdir reports/lab${LAB_NUMBER}
 $ cp tasks/lab${LAB_NUMBER}/README.md reports/lab${LAB_NUMBER}/REPORT.md
@@ -140,10 +174,9 @@ $ gist REPORT.md
 
 ## Links
 
-- [Create Hunter package](https://docs.hunter.sh/en/latest/creating-new/create.html)
-- [Custom Hunter config](https://github.com/ruslo/hunter/wiki/example.custom.config.id)
-- [Polly](https://github.com/ruslo/polly)
+- [Book](https://www.dockerbook.com)
+- [Instructions](https://docs.docker.com/engine/reference/builder/)
 
 ```
-Copyright (c) 2015-2020 The ISC Authors
+Copyright (c) 2015-2019 The ISC Authors
 ```
